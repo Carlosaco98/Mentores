@@ -55,7 +55,8 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  width: min(1180px, calc(100% - 36px));
+  width: calc(100% - 36px);
+  max-width: 1180px;
   margin: 0 auto;
   padding: 14px 0;
 }
@@ -108,7 +109,8 @@ button {
 }
 
 .main {
-  width: min(1180px, calc(100% - 36px));
+  width: calc(100% - 36px);
+  max-width: 1180px;
   min-width: 0;
   margin: 0 auto;
   padding: 26px 0 42px;
@@ -409,6 +411,7 @@ textarea {
   align-items: end;
   justify-content: space-between;
   gap: 14px;
+  min-width: 0;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -418,6 +421,7 @@ textarea {
 .filters {
   display: flex;
   gap: 8px;
+  min-width: 0;
   overflow-x: auto;
   padding-bottom: 2px;
 }
@@ -767,12 +771,13 @@ textarea {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   .header-inner {
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px;
-    width: min(100% - 24px, 1180px);
+    width: calc(100% - 24px);
+    max-width: 1180px;
   }
 
   .nav-list {
@@ -788,13 +793,20 @@ textarea {
     font-size: 0.88rem;
   }
 
+  .toolbar {
+    display: grid;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 720px) {
   .main {
-    width: min(100% - 24px, 1180px);
+    width: calc(100% - 24px);
+    max-width: 1180px;
     padding: 18px 0 32px;
   }
 
   .hero-row,
-  .toolbar,
   .agenda-head {
     display: grid;
     align-items: stretch;
