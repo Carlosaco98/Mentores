@@ -127,6 +127,12 @@ const els = {
   activeStudents: document.querySelector("#activeStudents"),
   pendingCarlos: document.querySelector("#pendingCarlos"),
   pendingIrene: document.querySelector("#pendingIrene"),
+  pageTitle: document.querySelector("#pageTitle"),
+  pageSubtitle: document.querySelector("#pageSubtitle"),
+  nextAppointmentTitle: document.querySelector("#nextAppointmentTitle"),
+  nextAppointmentMeta: document.querySelector("#nextAppointmentMeta"),
+  openTasksCount: document.querySelector("#openTasksCount"),
+  availableSlotsCount: document.querySelector("#availableSlotsCount"),
   agendaGrid: document.querySelector("#agendaGrid"),
   bookingForm: document.querySelector("#bookingForm"),
   bookingStudent: document.querySelector("#bookingStudent"),
@@ -267,10 +273,12 @@ function render() {
   }
 
   renderMetrics();
+  renderFocusCards();
   renderBookingStudents();
   renderAgenda();
   renderStudents();
   renderDetail();
+  applyView();
 }
 
 function renderMetrics() {
@@ -281,6 +289,58 @@ function renderMetrics() {
   els.activeStudents.textContent = active;
   els.pendingCarlos.textContent = currency.format(pendingCarlos);
   els.pendingIrene.textContent = currency.format(pendingIrene);
+}
+
+function renderFocusCards() {
+  const openTasks = state.students.reduce((sum, student) => sum + student.tasks.filter((task) => !task.done).length, 0);
+  const weekStartValue = toDateInputValue(state.weekStart);
+  const weekEndValue = toDateInputValue(addDays(state.weekStart, 4));
+  const bookedThisWeek = state.appointments.filter((appointment) => appointment.date >= weekStartValue && appointment.date <= weekEndValue).length;
+  const availableThisWeek = agendaTimes.length * 5 - bookedThisWeek;
+  const nextAppointment = getNextAppointment();
+
+  els.openTasksCount.textContent = openTasks;
+  els.availableSlotsCount.textContent = availableThisWeek;
+
+  if (!nextAppointment) {
+    els.nextAppointmentTitle.textContent = "Sin llamadas reservadas";
+    els.nextAppointmentMeta.textContent = "Entra en Agenda y reserva una hora libre.";
+    return;
+  }
+
+  const student = state.students.find((item) => item.id === nextAppointment.studentId);
+  els.nextAppointmentTitle.textContent = student?.name || "Alumno";
+  els.nextAppointmentMeta.textContent = `${formatDate(nextAppointment.date)} · ${nextAppointment.time} · ${nextAppointment.mentor} · ${nextAppointment.channel}`;
+}
+
+function getNextAppointment() {
+  const now = new Date();
+  return state.appointments
+    .map((appointment) => ({
+      ...appointment,
+      startsAt: new Date(`${appointment.date}T${appointment.time}:00`)
+    }))
+    .filter((appointment) => appointment.startsAt >= now)
+    .sort((a, b) => a.startsAt - b.startsAt)[0];
+}
+
+function applyView() {
+  const viewMeta = {
+    dashboard: ["Panel", "Lo importante de hoy, limpio y rapido."],
+    agenda: ["Agenda", "Reserva llamadas por Zoom o Meet en segundos."],
+    students: ["Alumnos", "Seguimiento, tienda, tareas y comentarios."],
+    tasks: ["Pendientes", "Alumnos con tareas o pagos por cerrar."],
+    money: ["Cobros", "Importes pendientes y alumnos pagados."]
+  };
+  const [title, subtitle] = viewMeta[state.view] || viewMeta.dashboard;
+
+  els.pageTitle.textContent = title;
+  els.pageSubtitle.textContent = subtitle;
+
+  document.querySelectorAll(".view-section").forEach((section) => {
+    const sections = section.dataset.section.split(" ");
+    section.hidden = !sections.includes(state.view);
+  });
 }
 
 function sumPendingForMentor(mentor) {
@@ -345,14 +405,17 @@ function renderAgenda() {
     <div class="agenda-days">
       ${days
         .map(
-          (day) => `
-          <div class="agenda-day">
+          (day) => {
+            const dayValue = toDateInputValue(day);
+            return `
+          <div class="agenda-day ${dayValue === toDateInputValue(new Date()) ? "today" : ""}">
             <div class="agenda-day-title">${weekdayFormat.format(day)}</div>
             <div class="slot-list">
               ${agendaTimes.map((time) => renderSlot(day, time)).join("")}
             </div>
           </div>
-        `
+        `;
+          }
         )
         .join("")}
     </div>

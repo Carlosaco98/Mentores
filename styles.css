@@ -22,8 +22,14 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
-  background: var(--bg);
+  background:
+    linear-gradient(180deg, rgba(247, 181, 0, 0.08), transparent 210px),
+    var(--bg);
   overflow-x: hidden;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 button,
@@ -100,12 +106,17 @@ button {
   padding: 10px 12px;
   color: #e8e1d5;
   background: transparent;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
 .nav-item.active,
 .nav-item:hover {
   color: #090909;
   background: var(--accent);
+}
+
+.nav-item:hover {
+  transform: translateY(-1px);
 }
 
 .main {
@@ -121,7 +132,14 @@ button {
   justify-content: space-between;
   align-items: end;
   gap: 18px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
+  padding: 24px;
+  border-radius: 8px;
+  color: #fff;
+  background:
+    linear-gradient(90deg, rgba(247, 181, 0, 0.18), transparent 48%),
+    var(--charcoal);
+  box-shadow: var(--shadow);
 }
 
 .eyebrow {
@@ -131,6 +149,10 @@ button {
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.hero-row .eyebrow {
+  color: var(--accent);
 }
 
 h1,
@@ -145,6 +167,16 @@ h1 {
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1;
   letter-spacing: 0;
+}
+
+.hero-row h1 {
+  color: #fff;
+}
+
+.page-subtitle {
+  max-width: 520px;
+  margin: 8px 0 0;
+  color: #d8d2c7;
 }
 
 h2 {
@@ -199,6 +231,7 @@ textarea {
   border: 1px solid transparent;
   padding: 0 14px;
   font-weight: 800;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease;
 }
 
 .primary-button {
@@ -215,6 +248,14 @@ textarea {
 .primary-button:hover,
 .nav-item.active:hover {
   background: #ffc82e;
+}
+
+.primary-button:hover,
+.ghost-button:hover,
+.chip:hover,
+.icon-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(9, 9, 9, 0.12);
 }
 
 .ghost-button {
@@ -240,7 +281,7 @@ textarea {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .metric-card {
@@ -248,6 +289,7 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .metric-card:first-child {
@@ -266,6 +308,57 @@ textarea {
   font-size: 1.65rem;
 }
 
+.metric-card:hover,
+.focus-card:hover,
+.student-panel:hover,
+.detail-panel:hover,
+.agenda-panel:hover {
+  border-color: rgba(247, 181, 0, 0.52);
+  box-shadow: 0 12px 36px rgba(9, 9, 9, 0.08);
+}
+
+.focus-grid {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(2, minmax(0, 0.7fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.focus-card {
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.focus-card span,
+.focus-card small {
+  display: block;
+  color: var(--muted);
+}
+
+.focus-card strong {
+  display: block;
+  margin: 10px 0 8px;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  overflow-wrap: anywhere;
+}
+
+.focus-card.dark-card {
+  color: #fff;
+  border-color: var(--charcoal);
+  background:
+    linear-gradient(135deg, rgba(247, 181, 0, 0.24), transparent 46%),
+    var(--charcoal);
+}
+
+.focus-card.dark-card span,
+.focus-card.dark-card small {
+  color: #d8d2c7;
+}
+
 .workspace {
   display: grid;
   gap: 12px;
@@ -275,10 +368,11 @@ textarea {
   display: grid;
   gap: 14px;
   margin-bottom: 14px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
+  transition: box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .agenda-head {
@@ -318,6 +412,7 @@ textarea {
 .agenda-week-label {
   color: var(--ink);
   font-weight: 900;
+  padding: 0 2px;
 }
 
 .agenda-days {
@@ -332,6 +427,12 @@ textarea {
   border-radius: 8px;
   overflow: hidden;
   background: #f7f5ee;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.agenda-day.today {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(247, 181, 0, 0.4);
 }
 
 .agenda-day-title {
@@ -356,6 +457,7 @@ textarea {
   border-radius: 8px;
   padding: 9px;
   text-align: left;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
 }
 
 .slot-button span,
@@ -379,6 +481,7 @@ textarea {
 
 .slot-button.available:hover {
   background: #ffe58a;
+  transform: translateY(-1px);
 }
 
 .slot-button.booked {
@@ -416,6 +519,7 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
+  box-shadow: 0 8px 26px rgba(9, 9, 9, 0.05);
 }
 
 .filters {
@@ -453,6 +557,7 @@ textarea {
   border-radius: 8px;
   background: var(--surface);
   box-shadow: none;
+  transition: box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .panel-heading {
@@ -479,11 +584,16 @@ textarea {
   padding: 14px 18px;
   text-align: left;
   background: #fff;
+  transition: background 150ms ease, transform 150ms ease;
 }
 
 .student-row:hover,
 .student-row.selected {
   background: #fff5cf;
+}
+
+.student-row:hover {
+  transform: translateX(2px);
 }
 
 .student-name {
@@ -552,6 +662,9 @@ textarea {
   position: sticky;
   top: 86px;
   padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(247, 181, 0, 0.08), transparent 150px),
+    #fff;
 }
 
 .detail-head {
@@ -757,6 +870,10 @@ textarea {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .focus-grid {
+    grid-template-columns: 1fr;
+  }
+
   .content-grid {
     grid-template-columns: 1fr;
   }
@@ -810,6 +927,7 @@ textarea {
   .agenda-head {
     display: grid;
     align-items: stretch;
+    padding: 18px;
   }
 
   .topbar-actions,
@@ -824,6 +942,10 @@ textarea {
 
   .metric-grid {
     grid-template-columns: 1fr;
+  }
+
+  .focus-card {
+    min-height: 116px;
   }
 
   .booking-form,
