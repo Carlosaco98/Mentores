@@ -11,16 +11,18 @@
       <header class="app-header">
         <div class="header-inner">
           <div class="brand">
-            <span class="brand-mark">C</span>
+            <img
+              class="brand-logo"
+              src="https://framerusercontent.com/images/HMHsAjHEWKdGMx38KxTbUGUfg.png?height=117&width=545"
+              alt="Coinnecta"
+            />
             <div>
-              <strong>COINNECTA</strong>
-              <span>Mentores</span>
+              <span class="brand-product">Mentores</span>
             </div>
           </div>
 
           <nav class="nav-list" aria-label="Secciones">
-            <button class="nav-item active" data-view="dashboard">Panel</button>
-            <button class="nav-item" data-view="agenda">Agenda</button>
+            <button class="nav-item active" data-view="agenda">Agenda</button>
             <button class="nav-item" data-view="students">Alumnos</button>
             <button class="nav-item" data-view="money">Cobros</button>
           </nav>
@@ -30,56 +32,35 @@
       <main class="main">
         <section class="hero-row">
           <div>
-            <p class="eyebrow">Academy operations</p>
-            <h1 id="pageTitle">Panel</h1>
-            <p class="page-subtitle" id="pageSubtitle">Resumen claro de alumnos, llamadas y cobros.</p>
+            <p class="eyebrow">Coinnecta Mentores</p>
+            <h1 id="pageTitle">Agenda alumnos sin lios.</h1>
+            <p class="page-subtitle" id="pageSubtitle">Elige alumno, pulsa una hora libre y deja todo claro.</p>
           </div>
           <div class="topbar-actions">
-            <button class="ghost-button" id="exportButton" type="button">Exportar</button>
+            <button class="ghost-button" id="exportButton" type="button">Exportar datos</button>
             <button class="primary-button" id="newStudentButton" type="button">Nuevo alumno</button>
           </div>
         </section>
 
-        <section class="metric-grid view-section" data-section="dashboard money" aria-label="Indicadores principales">
-          <article class="metric-card">
-            <span>Alumnos activos</span>
+        <section class="quick-metrics" aria-label="Resumen rapido">
+          <article>
+            <span>Alumnos</span>
             <strong id="activeStudents">0</strong>
-            <small>En seguimiento ahora</small>
           </article>
-          <article class="metric-card">
-            <span>Por pagar Carlos</span>
-            <strong id="pendingCarlos">0 EUR</strong>
-            <small>No pagado por Pascu</small>
-          </article>
-          <article class="metric-card">
-            <span>Por pagar Irene</span>
-            <strong id="pendingIrene">0 EUR</strong>
-            <small>No pagado por Pascu</small>
-          </article>
-        </section>
-
-        <section class="focus-grid view-section" data-section="dashboard">
-          <article class="focus-card dark-card">
-            <span>Proxima llamada</span>
-            <strong id="nextAppointmentTitle">Sin llamadas reservadas</strong>
-            <small id="nextAppointmentMeta">Reserva una hora desde Agenda.</small>
-          </article>
-          <article class="focus-card">
-            <span>Cobros por confirmar</span>
+          <article>
+            <span>Sin pagar</span>
             <strong id="unpaidStudentsCount">0</strong>
-            <small>Alumnos no pagados por Pascu.</small>
           </article>
-          <article class="focus-card">
-            <span>Huecos disponibles</span>
-            <strong id="availableSlotsCount">0</strong>
-            <small>Esta semana laboral.</small>
+          <article>
+            <span>Llamadas semana</span>
+            <strong id="weeklyCallsCount">0</strong>
           </article>
         </section>
 
         <section class="agenda-panel view-section" data-section="agenda" id="agendaSection" aria-label="Agenda de llamadas">
           <div class="agenda-head">
             <div>
-              <p class="eyebrow">Agenda</p>
+              <p class="eyebrow">Paso principal</p>
               <h2>Llamadas por Zoom o Meet</h2>
             </div>
             <div class="week-controls">
@@ -87,6 +68,12 @@
               <button class="ghost-button" id="currentWeekButton" type="button">Hoy</button>
               <button class="ghost-button" id="nextWeekButton" type="button">Siguiente</button>
             </div>
+          </div>
+
+          <div class="booking-guide" aria-label="Como agendar">
+            <span><strong>1</strong> Elige alumno</span>
+            <span><strong>2</strong> Pega enlace</span>
+            <span><strong>3</strong> Pulsa una hora libre</span>
           </div>
 
           <form class="booking-form" id="bookingForm">
@@ -118,7 +105,7 @@
           <div class="agenda-grid" id="agendaGrid"></div>
         </section>
 
-        <section class="workspace view-section" data-section="students money">
+        <section class="workspace view-section" data-section="students">
           <div class="toolbar">
             <label class="search-box">
               <span>Buscar</span>
@@ -128,8 +115,6 @@
               <button class="chip active" data-filter="all" type="button">Todos</button>
               <button class="chip" data-filter="active" type="button">Activos</button>
               <button class="chip" data-filter="ending" type="button">Finalizan</button>
-              <button class="chip" data-filter="unpaid" type="button">No pagados</button>
-              <button class="chip" data-filter="paid" type="button">Pagados</button>
             </div>
           </div>
 
@@ -149,6 +134,17 @@
               <div id="studentDetail"></div>
             </section>
           </div>
+        </section>
+
+        <section class="payment-panel view-section" data-section="money" aria-label="Control de cobros">
+          <div class="payment-head">
+            <div>
+              <p class="eyebrow">Cobros</p>
+              <h2>Pagado por Pascu</h2>
+            </div>
+            <button class="primary-button" id="newStudentPaymentButton" type="button">Nuevo alumno</button>
+          </div>
+          <div class="payment-board" id="paymentBoard"></div>
         </section>
       </main>
     </div>

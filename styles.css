@@ -23,6 +23,8 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background:
+    radial-gradient(circle at 18% 0%, rgba(247, 181, 0, 0.24), transparent 32%),
+    radial-gradient(circle at 88% 8%, rgba(255, 255, 255, 0.28), transparent 24%),
     linear-gradient(180deg, rgba(247, 181, 0, 0.08), transparent 210px),
     var(--bg);
   overflow-x: hidden;
@@ -52,8 +54,9 @@ button {
   top: 0;
   z-index: 5;
   color: #fff;
-  background: var(--charcoal);
+  background: rgba(10, 10, 10, 0.94);
   border-bottom: 1px solid rgba(247, 181, 0, 0.28);
+  backdrop-filter: blur(18px);
 }
 
 .header-inner {
@@ -70,28 +73,26 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  color: #090909;
-  background: var(--accent);
-  font-weight: 900;
-}
-
-.brand strong,
-.brand span {
+.brand-logo {
   display: block;
+  width: 150px;
+  height: auto;
+  max-height: 34px;
+  object-fit: contain;
 }
 
-.brand span {
-  color: #d8d2c7;
-  font-size: 0.9rem;
+.brand-product {
+  display: block;
+  padding: 5px 9px;
+  border: 1px solid rgba(247, 181, 0, 0.42);
+  border-radius: 999px;
+  color: #f7e7b2;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .nav-list {
@@ -132,14 +133,16 @@ button {
   justify-content: space-between;
   align-items: end;
   gap: 18px;
-  margin-bottom: 14px;
-  padding: 24px;
+  margin-bottom: 12px;
+  padding: clamp(22px, 4vw, 44px);
   border-radius: 8px;
   color: #fff;
   background:
-    linear-gradient(90deg, rgba(247, 181, 0, 0.18), transparent 48%),
+    linear-gradient(120deg, rgba(247, 181, 0, 0.24), transparent 42%),
+    radial-gradient(circle at 88% 18%, rgba(247, 181, 0, 0.2), transparent 24%),
     var(--charcoal);
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .eyebrow {
@@ -171,12 +174,45 @@ h1 {
 
 .hero-row h1 {
   color: #fff;
+  max-width: 760px;
+  font-size: clamp(2.3rem, 6vw, 5.5rem);
+  line-height: 0.94;
 }
 
 .page-subtitle {
   max-width: 520px;
   margin: 8px 0 0;
   color: #d8d2c7;
+}
+
+.quick-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.quick-metrics article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 1px solid rgba(9, 9, 9, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 10px 30px rgba(9, 9, 9, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.quick-metrics span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.quick-metrics strong {
+  font-size: 1.8rem;
 }
 
 h2 {
@@ -240,8 +276,7 @@ textarea {
 }
 
 .primary-button,
-.nav-item.active,
-.brand-mark {
+.nav-item.active {
   box-shadow: inset 0 -2px 0 rgba(9, 9, 9, 0.16);
 }
 
@@ -368,11 +403,12 @@ textarea {
   display: grid;
   gap: 14px;
   margin-bottom: 14px;
-  padding: 18px;
+  padding: clamp(16px, 2.4vw, 24px);
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   transition: box-shadow 160ms ease, border-color 160ms ease;
+  backdrop-filter: blur(12px);
 }
 
 .agenda-head {
@@ -387,6 +423,35 @@ textarea {
   gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.booking-guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.booking-guide span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid rgba(247, 181, 0, 0.34);
+  border-radius: 8px;
+  background: #fff8d8;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.booking-guide strong {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: var(--ink);
+  background: var(--accent);
 }
 
 .booking-form {
@@ -475,7 +540,7 @@ textarea {
 
 .slot-button.available {
   color: var(--ink);
-  background: #fff9df;
+  background: linear-gradient(180deg, #fff9df, #fff4bd);
   border-color: rgba(247, 181, 0, 0.48);
 }
 
@@ -486,7 +551,9 @@ textarea {
 
 .slot-button.booked {
   color: #fff;
-  background: var(--charcoal);
+  background:
+    linear-gradient(135deg, rgba(247, 181, 0, 0.16), transparent 42%),
+    var(--charcoal);
   border-color: var(--charcoal);
 }
 
@@ -675,6 +742,102 @@ textarea {
   background:
     linear-gradient(180deg, rgba(247, 181, 0, 0.08), transparent 150px),
     #fff;
+}
+
+.payment-panel {
+  display: grid;
+  gap: 14px;
+  padding: clamp(16px, 2.4vw, 24px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 36px rgba(9, 9, 9, 0.08);
+}
+
+.payment-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.payment-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.payment-column {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 280px;
+  padding: 12px;
+  border: 1px solid rgba(193, 70, 70, 0.22);
+  border-radius: 8px;
+  background: #fff6f6;
+}
+
+.payment-column.paid-column {
+  border-color: rgba(38, 122, 94, 0.22);
+  background: #f4fbf7;
+}
+
+.payment-column-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.payment-column-head strong {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--charcoal);
+}
+
+.payment-list {
+  display: grid;
+  gap: 8px;
+}
+
+.payment-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.payment-card strong,
+.payment-card span {
+  display: block;
+}
+
+.payment-card span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.payment-empty {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.65);
+  text-align: center;
 }
 
 .detail-head {
@@ -889,7 +1052,8 @@ textarea {
   }
 
   .booking-form,
-  .agenda-days {
+  .agenda-days,
+  .payment-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -909,7 +1073,7 @@ textarea {
 
   .nav-list {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
     overflow: visible;
   }
@@ -927,6 +1091,14 @@ textarea {
 }
 
 @media (max-width: 720px) {
+  .brand {
+    justify-content: space-between;
+  }
+
+  .brand-logo {
+    width: 136px;
+  }
+
   .main {
     width: calc(100% - 24px);
     max-width: 1180px;
@@ -959,8 +1131,16 @@ textarea {
   }
 
   .booking-form,
-  .agenda-days {
+  .agenda-days,
+  .booking-guide,
+  .payment-board,
+  .quick-metrics {
     grid-template-columns: 1fr;
+  }
+
+  .payment-head,
+  .payment-card {
+    display: grid;
   }
 
   .student-row {

@@ -1,13 +1,13 @@
 # Coinnecta Mentores
 
-Primera version de una web interna para dejar atras el Excel de seguimiento de alumnos.
+Web interna para dejar atras el Excel de seguimiento de alumnos.
 
 El diseño sigue el branding de Coinnecta: negro/blanco con amarillo de acento, marca `COINNECTA` y una interfaz interna limpia para mentores. Ver `BRANDING.md`.
 
 ## Que incluye
 
-- Panel con alumnos activos, cobros por confirmar y revisiones proximas.
-- Vistas simples por seccion: panel, agenda, alumnos y cobros.
+- Tres pantallas simples: agenda, alumnos y cobros.
+- Resumen superior con alumnos, cobros sin pagar y llamadas de la semana.
 - Lista filtrable por alumno, tienda, curso, pagos y fechas.
 - Ficha de alumno con fechas, precio, mentores, tienda y estado.
 - Agenda semanal para reservar llamadas por Zoom o Meet con alumnos.

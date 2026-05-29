@@ -125,20 +125,17 @@ const state = {
   weekStart: getWeekStart(new Date()),
   selectedId: null,
   filter: "all",
-  view: "dashboard",
+  view: "agenda",
   search: ""
 };
 
 const els = {
   activeStudents: document.querySelector("#activeStudents"),
-  pendingCarlos: document.querySelector("#pendingCarlos"),
-  pendingIrene: document.querySelector("#pendingIrene"),
   pageTitle: document.querySelector("#pageTitle"),
   pageSubtitle: document.querySelector("#pageSubtitle"),
-  nextAppointmentTitle: document.querySelector("#nextAppointmentTitle"),
-  nextAppointmentMeta: document.querySelector("#nextAppointmentMeta"),
   unpaidStudentsCount: document.querySelector("#unpaidStudentsCount"),
-  availableSlotsCount: document.querySelector("#availableSlotsCount"),
+  weeklyCallsCount: document.querySelector("#weeklyCallsCount"),
+  paymentBoard: document.querySelector("#paymentBoard"),
   agendaGrid: document.querySelector("#agendaGrid"),
   bookingForm: document.querySelector("#bookingForm"),
   bookingStudent: document.querySelector("#bookingStudent"),
@@ -292,9 +289,9 @@ function render() {
   }
 
   renderMetrics();
-  renderFocusCards();
   renderBookingStudents();
   renderAgenda();
+  renderPaymentBoard();
   renderStudents();
   renderDetail();
   applyView();
@@ -302,55 +299,23 @@ function render() {
 
 function renderMetrics() {
   const active = state.students.filter((student) => student.status !== "finished").length;
-  const pendingCarlos = sumPendingForMentor("carlos");
-  const pendingIrene = sumPendingForMentor("irene");
-
-  els.activeStudents.textContent = active;
-  els.pendingCarlos.textContent = currency.format(pendingCarlos);
-  els.pendingIrene.textContent = currency.format(pendingIrene);
-}
-
-function renderFocusCards() {
   const unpaidStudents = state.students.filter((student) => !isPascuPaid(student)).length;
   const weekStartValue = toDateInputValue(state.weekStart);
   const weekEndValue = toDateInputValue(addDays(state.weekStart, 4));
-  const bookedThisWeek = state.appointments.filter((appointment) => appointment.date >= weekStartValue && appointment.date <= weekEndValue).length;
-  const availableThisWeek = agendaTimes.length * 5 - bookedThisWeek;
-  const nextAppointment = getNextAppointment();
+  const weeklyCalls = state.appointments.filter((appointment) => appointment.date >= weekStartValue && appointment.date <= weekEndValue).length;
 
+  els.activeStudents.textContent = active;
   els.unpaidStudentsCount.textContent = unpaidStudents;
-  els.availableSlotsCount.textContent = availableThisWeek;
-
-  if (!nextAppointment) {
-    els.nextAppointmentTitle.textContent = "Sin llamadas reservadas";
-    els.nextAppointmentMeta.textContent = "Entra en Agenda y reserva una hora libre.";
-    return;
-  }
-
-  const student = state.students.find((item) => item.id === nextAppointment.studentId);
-  els.nextAppointmentTitle.textContent = student?.name || "Alumno";
-  els.nextAppointmentMeta.textContent = `${formatDate(nextAppointment.date)} - ${nextAppointment.time} - ${nextAppointment.mentor} - ${nextAppointment.channel}`;
-}
-
-function getNextAppointment() {
-  const now = new Date();
-  return state.appointments
-    .map((appointment) => ({
-      ...appointment,
-      startsAt: new Date(`${appointment.date}T${appointment.time}:00`)
-    }))
-    .filter((appointment) => appointment.startsAt >= now)
-    .sort((a, b) => a.startsAt - b.startsAt)[0];
+  els.weeklyCallsCount.textContent = weeklyCalls;
 }
 
 function applyView() {
   const viewMeta = {
-    dashboard: ["Panel", "Lo importante de hoy, limpio y rapido."],
-    agenda: ["Agenda", "Reserva llamadas por Zoom o Meet en segundos."],
-    students: ["Alumnos", "Seguimiento, tienda y comentarios."],
-    money: ["Cobros", "Control rapido de pagado por Pascu o no pagado."]
+    agenda: ["Agenda alumnos sin lios.", "Elige alumno, pega enlace y pulsa una hora libre."],
+    students: ["Alumnos claros.", "Ficha simple: tienda, estado, pago y comentarios."],
+    money: ["Cobros sin dudas.", "Marca si Pascu ya ha pagado o falta por pagar."]
   };
-  const [title, subtitle] = viewMeta[state.view] || viewMeta.dashboard;
+  const [title, subtitle] = viewMeta[state.view] || viewMeta.agenda;
 
   els.pageTitle.textContent = title;
   els.pageSubtitle.textContent = subtitle;
@@ -359,13 +324,6 @@ function applyView() {
     const sections = section.dataset.section.split(" ");
     section.hidden = !sections.includes(state.view);
   });
-}
-
-function sumPendingForMentor(mentor) {
-  return state.students.reduce((sum, student) => {
-    if (!student.mentors?.[mentor]) return sum;
-    return sum + pendingAmount(student);
-  }, 0);
 }
 
 function renderStudents() {
@@ -398,6 +356,50 @@ function renderStudents() {
     });
     els.studentList.append(row);
   }
+}
+
+function renderPaymentBoard() {
+  const unpaid = state.students.filter((student) => !isPascuPaid(student));
+  const paid = state.students.filter(isPascuPaid);
+
+  els.paymentBoard.innerHTML = `
+    <section class="payment-column">
+      <div class="payment-column-head">
+        <span>No pagados</span>
+        <strong>${unpaid.length}</strong>
+      </div>
+      <div class="payment-list">
+        ${unpaid.map((student) => renderPaymentCard(student, "mark-paid")).join("") || renderPaymentEmpty("No falta nadie por pagar.")}
+      </div>
+    </section>
+    <section class="payment-column paid-column">
+      <div class="payment-column-head">
+        <span>Pagados por Pascu</span>
+        <strong>${paid.length}</strong>
+      </div>
+      <div class="payment-list">
+        ${paid.map((student) => renderPaymentCard(student, "mark-unpaid")).join("") || renderPaymentEmpty("Aun no hay alumnos pagados.")}
+      </div>
+    </section>
+  `;
+}
+
+function renderPaymentCard(student, action) {
+  return `
+    <article class="payment-card">
+      <div>
+        <strong>${escapeHtml(student.name)}</strong>
+        <span>${escapeHtml(student.course)} - ${currency.format(student.price || 0)}</span>
+      </div>
+      <button class="${action === "mark-paid" ? "primary-button" : "ghost-button"}" data-action="${action}" data-student-id="${student.id}" type="button">
+        ${action === "mark-paid" ? "Marcar pagado" : "Marcar no pagado"}
+      </button>
+    </article>
+  `;
+}
+
+function renderPaymentEmpty(text) {
+  return `<div class="payment-empty">${escapeHtml(text)}</div>`;
 }
 
 function renderBookingStudents() {
@@ -646,6 +648,7 @@ function escapeHtml(value = "") {
 }
 
 document.querySelector("#newStudentButton").addEventListener("click", () => openStudentDialog());
+document.querySelector("#newStudentPaymentButton").addEventListener("click", () => openStudentDialog());
 document.querySelector("#closeDialogButton").addEventListener("click", () => els.dialog.close());
 document.querySelector("#cancelDialogButton").addEventListener("click", () => els.dialog.close());
 document.querySelector("#exportButton").addEventListener("click", exportData);
@@ -660,17 +663,17 @@ document.querySelector("#resetDemoButton").addEventListener("click", () => {
 
 document.querySelector("#previousWeekButton").addEventListener("click", () => {
   state.weekStart = addDays(state.weekStart, -7);
-  renderAgenda();
+  render();
 });
 
 document.querySelector("#currentWeekButton").addEventListener("click", () => {
   state.weekStart = getWeekStart(new Date());
-  renderAgenda();
+  render();
 });
 
 document.querySelector("#nextWeekButton").addEventListener("click", () => {
   state.weekStart = addDays(state.weekStart, 7);
-  renderAgenda();
+  render();
 });
 
 els.searchInput.addEventListener("input", (event) => {
@@ -695,14 +698,33 @@ document.querySelectorAll(".nav-item").forEach((item) => {
     item.classList.add("active");
     state.view = item.dataset.view;
 
-    const filterForView = { dashboard: "all", agenda: "all", students: "all", money: "unpaid" }[state.view];
-    const chip = document.querySelector(`.chip[data-filter="${filterForView}"]`);
-    chip?.click();
-
-    if (state.view === "agenda") {
-      document.querySelector("#agendaSection").scrollIntoView({ behavior: "smooth", block: "start" });
+    if (state.view === "students") {
+      state.filter = "all";
+      document.querySelectorAll(".chip").forEach((chip) => chip.classList.toggle("active", chip.dataset.filter === "all"));
     }
+
+    render();
   });
+});
+
+els.paymentBoard.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-action]");
+  if (!button) return;
+
+  const studentId = button.dataset.studentId;
+  const shouldBePaid = button.dataset.action === "mark-paid";
+
+  state.students = state.students.map((student) => {
+    if (student.id !== studentId) return student;
+    return {
+      ...student,
+      pascuPaid: shouldBePaid,
+      paid: shouldBePaid ? Number(student.price || 0) : 0
+    };
+  });
+  state.selectedId = studentId;
+  saveStudents();
+  render();
 });
 
 els.agendaGrid.addEventListener("click", (event) => {
@@ -733,7 +755,7 @@ els.agendaGrid.addEventListener("click", (event) => {
     const appointmentId = deleteButton.closest("[data-appointment-id]")?.dataset.appointmentId;
     state.appointments = state.appointments.filter((appointment) => appointment.id !== appointmentId);
     saveAppointments();
-    renderAgenda();
+    render();
   }
 });
 
