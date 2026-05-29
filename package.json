@@ -1,0 +1,10 @@
+{
+  "name": "coinnecta-mentores",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Panel ligero para gestionar alumnos, mentores, fechas, pagos, tiendas, tareas y comentarios.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}

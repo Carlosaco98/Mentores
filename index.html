@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coinnecta Mentores</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="header-inner">
+          <div class="brand">
+            <span class="brand-mark">C</span>
+            <div>
+              <strong>COINNECTA</strong>
+              <span>Mentores</span>
+            </div>
+          </div>
+
+          <nav class="nav-list" aria-label="Secciones">
+            <button class="nav-item active" data-view="dashboard">Panel</button>
+            <button class="nav-item" data-view="students">Alumnos</button>
+            <button class="nav-item" data-view="tasks">Pendientes</button>
+            <button class="nav-item" data-view="money">Cobros</button>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="hero-row">
+          <div>
+            <p class="eyebrow">Academy operations</p>
+            <h1>Mentores</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-button" id="exportButton" type="button">Exportar</button>
+            <button class="primary-button" id="newStudentButton" type="button">Nuevo alumno</button>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="Indicadores principales">
+          <article class="metric-card">
+            <span>Alumnos activos</span>
+            <strong id="activeStudents">0</strong>
+            <small>En seguimiento ahora</small>
+          </article>
+          <article class="metric-card">
+            <span>Pendiente Carlos</span>
+            <strong id="pendingCarlos">0 EUR</strong>
+            <small>Pagos sin cerrar</small>
+          </article>
+          <article class="metric-card">
+            <span>Pendiente Irene</span>
+            <strong id="pendingIrene">0 EUR</strong>
+            <small>Pagos sin cerrar</small>
+          </article>
+        </section>
+
+        <section class="workspace">
+          <div class="toolbar">
+            <label class="search-box">
+              <span>Buscar</span>
+              <input id="searchInput" type="search" placeholder="Alumno, tienda o curso" />
+            </label>
+            <div class="filters" aria-label="Filtros">
+              <button class="chip active" data-filter="all" type="button">Todos</button>
+              <button class="chip" data-filter="active" type="button">Activos</button>
+              <button class="chip" data-filter="pending" type="button">Pendientes</button>
+              <button class="chip" data-filter="ending" type="button">Finalizan</button>
+              <button class="chip" data-filter="paid" type="button">Pagados</button>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <section class="student-panel" aria-label="Listado de alumnos">
+              <div class="panel-heading">
+                <div>
+                <p class="eyebrow">Seguimiento</p>
+                <h2>Alumnos</h2>
+              </div>
+                <button class="text-button" id="resetDemoButton" type="button">Recargar demo</button>
+              </div>
+              <div class="student-list" id="studentList"></div>
+            </section>
+
+            <section class="detail-panel" aria-label="Ficha de alumno">
+              <div id="studentDetail"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="studentDialog" class="student-dialog">
+      <form id="studentForm" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">Alta rapida</p>
+            <h2 id="dialogTitle">Nuevo alumno</h2>
+          </div>
+          <button class="icon-button" id="closeDialogButton" type="button" aria-label="Cerrar">x</button>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Nombre
+            <input name="name" required placeholder="Nombre del alumno" />
+          </label>
+          <label>
+            Curso
+            <select name="course">
+              <option value="1-1">1-1</option>
+              <option value="SKOOL">SKOOL</option>
+              <option value="Grupo">Grupo</option>
+            </select>
+          </label>
+          <label>
+            Fecha inicio
+            <input name="startDate" type="date" required />
+          </label>
+          <label>
+            Fecha fin
+            <input name="endDate" type="date" required />
+          </label>
+          <label>
+            Precio
+            <input name="price" type="number" min="0" step="10" value="100" />
+          </label>
+          <label>
+            Pagado
+            <input name="paid" type="number" min="0" step="10" value="0" />
+          </label>
+          <label>
+            Tienda
+            <input name="store" placeholder="URL o nombre de tienda" />
+          </label>
+          <label>
+            Estado
+            <select name="status">
+              <option value="active">Activo</option>
+              <option value="review">En revision</option>
+              <option value="blocked">Bloqueado</option>
+              <option value="finished">Finalizado</option>
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="mentor-fieldset">
+          <legend>Mentores</legend>
+          <label><input type="checkbox" name="mentorCarlos" checked /> Carlos</label>
+          <label><input type="checkbox" name="mentorIrene" /> Irene</label>
+        </fieldset>
+
+        <label class="wide-label">
+          Proxima accion
+          <textarea name="nextAction" rows="3" placeholder="Que falta, que revisar o que pedirle"></textarea>
+        </label>
+
+        <div class="dialog-actions">
+          <button class="ghost-button" id="cancelDialogButton" type="button">Cancelar</button>
+          <button class="primary-button" type="submit">Guardar alumno</button>
+        </div>
+      </form>
+    </dialog>
+
+    <template id="emptyStateTemplate">
+      <div class="empty-state">
+        <strong>No hay alumnos con este filtro.</strong>
+        <span>Prueba otra busqueda o crea uno nuevo.</span>
+      </div>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
