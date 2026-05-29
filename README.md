@@ -9,6 +9,7 @@ El diseño sigue el branding de Coinnecta: negro/blanco con amarillo de acento, 
 - Panel con alumnos activos, pagos pendientes por mentor y revisiones proximas.
 - Lista filtrable por alumno, tienda, curso, pendientes, pagos y fechas.
 - Ficha de alumno con fechas, precio, mentores, tienda y estado.
+- Agenda semanal para reservar llamadas por Zoom o Meet con alumnos.
 - Comentarios de tienda y tareas pendientes.
 - Alta y edicion rapida de alumnos.
 - Persistencia local en el navegador y exportacion JSON.

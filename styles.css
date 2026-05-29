@@ -269,6 +269,141 @@ textarea {
   gap: 12px;
 }
 
+.agenda-panel {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.agenda-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.week-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.booking-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) minmax(130px, 0.7fr) minmax(120px, 0.6fr) minmax(220px, 1.3fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.booking-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.agenda-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.agenda-week-label {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.agenda-days {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.agenda-day {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f7f5ee;
+}
+
+.agenda-day-title {
+  padding: 10px;
+  color: #fff;
+  background: var(--charcoal);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.slot-list {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+}
+
+.slot-button {
+  width: 100%;
+  min-height: 74px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px;
+  text-align: left;
+}
+
+.slot-button span,
+.slot-button small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.slot-button strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.slot-button.available {
+  color: var(--ink);
+  background: #fff9df;
+  border-color: rgba(247, 181, 0, 0.48);
+}
+
+.slot-button.available:hover {
+  background: #ffe58a;
+}
+
+.slot-button.booked {
+  color: #fff;
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+}
+
+.slot-button.booked span,
+.slot-button.booked small {
+  color: #d8d2c7;
+}
+
+.slot-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.slot-actions a {
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
 .toolbar {
   display: flex;
   align-items: end;
@@ -622,6 +757,11 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .booking-form,
+  .agenda-days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .detail-panel {
     position: static;
   }
@@ -637,7 +777,7 @@ textarea {
 
   .nav-list {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     width: 100%;
     overflow: visible;
   }
@@ -654,7 +794,8 @@ textarea {
   }
 
   .hero-row,
-  .toolbar {
+  .toolbar,
+  .agenda-head {
     display: grid;
     align-items: stretch;
   }
@@ -670,6 +811,11 @@ textarea {
   }
 
   .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-form,
+  .agenda-days {
     grid-template-columns: 1fr;
   }
 

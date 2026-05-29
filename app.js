@@ -1,6 +1,9 @@
 const STORAGE_KEY = "coinnecta-mentores-v1";
+const CALENDAR_KEY = "coinnecta-mentores-agenda-v1";
 const currency = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" });
 const dateFormat = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+const weekdayFormat = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "2-digit", month: "2-digit" });
+const agendaTimes = ["10:00", "11:00", "12:00", "16:00", "17:00", "18:00"];
 
 const seedStudents = [
   {
@@ -112,6 +115,8 @@ const seedStudents = [
 
 const state = {
   students: loadStudents(),
+  appointments: loadAppointments(),
+  weekStart: getWeekStart(new Date()),
   selectedId: null,
   filter: "all",
   view: "dashboard",
@@ -122,6 +127,9 @@ const els = {
   activeStudents: document.querySelector("#activeStudents"),
   pendingCarlos: document.querySelector("#pendingCarlos"),
   pendingIrene: document.querySelector("#pendingIrene"),
+  agendaGrid: document.querySelector("#agendaGrid"),
+  bookingForm: document.querySelector("#bookingForm"),
+  bookingStudent: document.querySelector("#bookingStudent"),
   studentList: document.querySelector("#studentList"),
   studentDetail: document.querySelector("#studentDetail"),
   searchInput: document.querySelector("#searchInput"),
@@ -145,6 +153,21 @@ function saveStudents() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.students));
 }
 
+function loadAppointments() {
+  const saved = localStorage.getItem(CALENDAR_KEY);
+  if (!saved) return [];
+
+  try {
+    return JSON.parse(saved);
+  } catch {
+    return [];
+  }
+}
+
+function saveAppointments() {
+  localStorage.setItem(CALENDAR_KEY, JSON.stringify(state.appointments));
+}
+
 function parseLocalDate(value) {
   if (!value) return null;
   const [year, month, day] = value.split("-").map(Number);
@@ -154,6 +177,26 @@ function parseLocalDate(value) {
 function formatDate(value) {
   const date = parseLocalDate(value);
   return date ? dateFormat.format(date) : "-";
+}
+
+function toDateInputValue(date) {
+  const copy = new Date(date);
+  copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+  return copy.toISOString().slice(0, 10);
+}
+
+function getWeekStart(date) {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  const day = copy.getDay() || 7;
+  copy.setDate(copy.getDate() - day + 1);
+  return copy;
+}
+
+function addDays(date, days) {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + days);
+  return copy;
 }
 
 function pendingAmount(student) {
@@ -224,6 +267,8 @@ function render() {
   }
 
   renderMetrics();
+  renderBookingStudents();
+  renderAgenda();
   renderStudents();
   renderDetail();
 }
@@ -275,6 +320,70 @@ function renderStudents() {
     });
     els.studentList.append(row);
   }
+}
+
+function renderBookingStudents() {
+  const previousValue = els.bookingStudent.value;
+  els.bookingStudent.innerHTML = state.students
+    .filter((student) => student.status !== "finished")
+    .map((student) => `<option value="${student.id}">${escapeHtml(student.name)}</option>`)
+    .join("");
+
+  if (previousValue && state.students.some((student) => student.id === previousValue)) {
+    els.bookingStudent.value = previousValue;
+  } else if (state.selectedId) {
+    els.bookingStudent.value = state.selectedId;
+  }
+}
+
+function renderAgenda() {
+  const days = Array.from({ length: 5 }, (_, index) => addDays(state.weekStart, index));
+  const weekLabel = `${formatDate(toDateInputValue(days[0]))} - ${formatDate(toDateInputValue(days[4]))}`;
+
+  els.agendaGrid.innerHTML = `
+    <div class="agenda-week-label">${weekLabel}</div>
+    <div class="agenda-days">
+      ${days
+        .map(
+          (day) => `
+          <div class="agenda-day">
+            <div class="agenda-day-title">${weekdayFormat.format(day)}</div>
+            <div class="slot-list">
+              ${agendaTimes.map((time) => renderSlot(day, time)).join("")}
+            </div>
+          </div>
+        `
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderSlot(day, time) {
+  const date = toDateInputValue(day);
+  const appointment = state.appointments.find((item) => item.date === date && item.time === time);
+
+  if (!appointment) {
+    return `
+      <button class="slot-button available" data-action="book-slot" data-date="${date}" data-time="${time}" type="button">
+        <span>${time}</span>
+        <strong>Disponible</strong>
+      </button>
+    `;
+  }
+
+  const student = state.students.find((item) => item.id === appointment.studentId);
+  return `
+    <div class="slot-button booked" data-appointment-id="${appointment.id}">
+      <span>${time} · ${escapeHtml(appointment.channel)}</span>
+      <strong>${escapeHtml(student?.name || "Alumno")}</strong>
+      <small>${escapeHtml(appointment.mentor)}</small>
+      <div class="slot-actions">
+        ${appointment.link ? `<a href="${escapeHtml(appointment.link)}" target="_blank" rel="noreferrer">Abrir</a>` : ""}
+        <button class="mini-button" data-action="delete-appointment" type="button">Liberar</button>
+      </div>
+    </div>
+  `;
 }
 
 function renderMentorDots(student) {
@@ -464,7 +573,7 @@ function updateSelected(mutator) {
 }
 
 function exportData() {
-  const payload = JSON.stringify(state.students, null, 2);
+  const payload = JSON.stringify({ students: state.students, appointments: state.appointments }, null, 2);
   const blob = new Blob([payload], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -489,9 +598,26 @@ document.querySelector("#cancelDialogButton").addEventListener("click", () => el
 document.querySelector("#exportButton").addEventListener("click", exportData);
 document.querySelector("#resetDemoButton").addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(CALENDAR_KEY);
   state.students = structuredClone(seedStudents);
+  state.appointments = [];
   state.selectedId = state.students[0]?.id || null;
   render();
+});
+
+document.querySelector("#previousWeekButton").addEventListener("click", () => {
+  state.weekStart = addDays(state.weekStart, -7);
+  renderAgenda();
+});
+
+document.querySelector("#currentWeekButton").addEventListener("click", () => {
+  state.weekStart = getWeekStart(new Date());
+  renderAgenda();
+});
+
+document.querySelector("#nextWeekButton").addEventListener("click", () => {
+  state.weekStart = addDays(state.weekStart, 7);
+  renderAgenda();
 });
 
 els.searchInput.addEventListener("input", (event) => {
@@ -516,10 +642,46 @@ document.querySelectorAll(".nav-item").forEach((item) => {
     item.classList.add("active");
     state.view = item.dataset.view;
 
-    const filterForView = { dashboard: "all", students: "all", tasks: "pending", money: "pending" }[state.view];
+    const filterForView = { dashboard: "all", agenda: "all", students: "all", tasks: "pending", money: "pending" }[state.view];
     const chip = document.querySelector(`.chip[data-filter="${filterForView}"]`);
     chip?.click();
+
+    if (state.view === "agenda") {
+      document.querySelector("#agendaSection").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
+});
+
+els.agendaGrid.addEventListener("click", (event) => {
+  const bookButton = event.target.closest('[data-action="book-slot"]');
+  const deleteButton = event.target.closest('[data-action="delete-appointment"]');
+
+  if (bookButton) {
+    const data = new FormData(els.bookingForm);
+    const studentId = data.get("studentId");
+
+    if (!studentId) return;
+
+    state.appointments.push({
+      id: crypto.randomUUID(),
+      date: bookButton.dataset.date,
+      time: bookButton.dataset.time,
+      studentId,
+      mentor: data.get("mentor"),
+      channel: data.get("channel"),
+      link: data.get("link").trim()
+    });
+    state.selectedId = studentId;
+    saveAppointments();
+    render();
+  }
+
+  if (deleteButton) {
+    const appointmentId = deleteButton.closest("[data-appointment-id]")?.dataset.appointmentId;
+    state.appointments = state.appointments.filter((appointment) => appointment.id !== appointmentId);
+    saveAppointments();
+    renderAgenda();
+  }
 });
 
 els.studentDetail.addEventListener("click", (event) => {

@@ -20,6 +20,7 @@
 
           <nav class="nav-list" aria-label="Secciones">
             <button class="nav-item active" data-view="dashboard">Panel</button>
+            <button class="nav-item" data-view="agenda">Agenda</button>
             <button class="nav-item" data-view="students">Alumnos</button>
             <button class="nav-item" data-view="tasks">Pendientes</button>
             <button class="nav-item" data-view="money">Cobros</button>
@@ -55,6 +56,48 @@
             <strong id="pendingIrene">0 EUR</strong>
             <small>Pagos sin cerrar</small>
           </article>
+        </section>
+
+        <section class="agenda-panel" id="agendaSection" aria-label="Agenda de llamadas">
+          <div class="agenda-head">
+            <div>
+              <p class="eyebrow">Agenda</p>
+              <h2>Llamadas por Zoom o Meet</h2>
+            </div>
+            <div class="week-controls">
+              <button class="ghost-button" id="previousWeekButton" type="button">Semana anterior</button>
+              <button class="ghost-button" id="currentWeekButton" type="button">Hoy</button>
+              <button class="ghost-button" id="nextWeekButton" type="button">Semana siguiente</button>
+            </div>
+          </div>
+
+          <form class="booking-form" id="bookingForm">
+            <label>
+              Alumno
+              <select id="bookingStudent" name="studentId"></select>
+            </label>
+            <label>
+              Mentor
+              <select name="mentor">
+                <option value="Carlos">Carlos</option>
+                <option value="Irene">Irene</option>
+                <option value="Carlos + Irene">Carlos + Irene</option>
+              </select>
+            </label>
+            <label>
+              Canal
+              <select name="channel">
+                <option value="Zoom">Zoom</option>
+                <option value="Meet">Meet</option>
+              </select>
+            </label>
+            <label>
+              Enlace
+              <input name="link" placeholder="https://zoom.us/... o https://meet.google.com/..." />
+            </label>
+          </form>
+
+          <div class="agenda-grid" id="agendaGrid"></div>
         </section>
 
         <section class="workspace">
