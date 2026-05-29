@@ -15,6 +15,7 @@ const seedStudents = [
     endDate: "2026-05-09",
     price: 100,
     paid: 0,
+    pascuPaid: false,
     status: "active",
     mentors: { carlos: true, irene: true },
     nextAction: "Revisar estructura de tienda y confirmar tareas de la semana.",
@@ -35,6 +36,7 @@ const seedStudents = [
     endDate: "2026-05-20",
     price: 100,
     paid: 0,
+    pascuPaid: false,
     status: "review",
     mentors: { carlos: true, irene: false },
     nextAction: "Revisar proveedores y dejar checklist de mejoras.",
@@ -54,6 +56,7 @@ const seedStudents = [
     endDate: "2026-06-02",
     price: 100,
     paid: 0,
+    pascuPaid: false,
     status: "blocked",
     mentors: { carlos: true, irene: false },
     nextAction: "Desbloquear seleccion de nicho y producto ganador.",
@@ -71,6 +74,7 @@ const seedStudents = [
     endDate: "2026-06-08",
     price: 0,
     paid: 0,
+    pascuPaid: false,
     status: "active",
     mentors: { carlos: false, irene: false },
     nextAction: "Esperando primera revision.",
@@ -86,6 +90,7 @@ const seedStudents = [
     endDate: "2026-08-20",
     price: 100,
     paid: 0,
+    pascuPaid: false,
     status: "active",
     mentors: { carlos: false, irene: false },
     nextAction: "Definir tienda y preparar objetivos de la semana 1.",
@@ -103,6 +108,7 @@ const seedStudents = [
     endDate: "2026-08-20",
     price: 100,
     paid: 100,
+    pascuPaid: true,
     status: "active",
     mentors: { carlos: false, irene: false },
     nextAction: "Revisar upsells y email de carrito abandonado.",
@@ -131,7 +137,7 @@ const els = {
   pageSubtitle: document.querySelector("#pageSubtitle"),
   nextAppointmentTitle: document.querySelector("#nextAppointmentTitle"),
   nextAppointmentMeta: document.querySelector("#nextAppointmentMeta"),
-  openTasksCount: document.querySelector("#openTasksCount"),
+  unpaidStudentsCount: document.querySelector("#unpaidStudentsCount"),
   availableSlotsCount: document.querySelector("#availableSlotsCount"),
   agendaGrid: document.querySelector("#agendaGrid"),
   bookingForm: document.querySelector("#bookingForm"),
@@ -206,7 +212,20 @@ function addDays(date, days) {
 }
 
 function pendingAmount(student) {
-  return Math.max(0, Number(student.price || 0) - Number(student.paid || 0));
+  return isPascuPaid(student) ? 0 : Number(student.price || 0);
+}
+
+function isPascuPaid(student) {
+  if (typeof student.pascuPaid === "boolean") return student.pascuPaid;
+  return Number(student.paid || 0) >= Number(student.price || 0) && Number(student.price || 0) > 0;
+}
+
+function paymentLabel(student) {
+  return isPascuPaid(student) ? "Pagado por Pascu" : "No pagado";
+}
+
+function paymentClass(student) {
+  return isPascuPaid(student) ? "status-paid" : "status-unpaid";
 }
 
 function studentMentors(student) {
@@ -254,9 +273,9 @@ function visibleStudents() {
     const matchesFilter =
       state.filter === "all" ||
       (state.filter === "active" && student.status !== "finished") ||
-      (state.filter === "pending" && (pendingAmount(student) > 0 || student.tasks.some((task) => !task.done))) ||
       (state.filter === "ending" && isEndingSoon(student)) ||
-      (state.filter === "paid" && pendingAmount(student) === 0);
+      (state.filter === "unpaid" && !isPascuPaid(student)) ||
+      (state.filter === "paid" && isPascuPaid(student));
 
     return matchesSearch && matchesFilter;
   });
@@ -292,14 +311,14 @@ function renderMetrics() {
 }
 
 function renderFocusCards() {
-  const openTasks = state.students.reduce((sum, student) => sum + student.tasks.filter((task) => !task.done).length, 0);
+  const unpaidStudents = state.students.filter((student) => !isPascuPaid(student)).length;
   const weekStartValue = toDateInputValue(state.weekStart);
   const weekEndValue = toDateInputValue(addDays(state.weekStart, 4));
   const bookedThisWeek = state.appointments.filter((appointment) => appointment.date >= weekStartValue && appointment.date <= weekEndValue).length;
   const availableThisWeek = agendaTimes.length * 5 - bookedThisWeek;
   const nextAppointment = getNextAppointment();
 
-  els.openTasksCount.textContent = openTasks;
+  els.unpaidStudentsCount.textContent = unpaidStudents;
   els.availableSlotsCount.textContent = availableThisWeek;
 
   if (!nextAppointment) {
@@ -310,7 +329,7 @@ function renderFocusCards() {
 
   const student = state.students.find((item) => item.id === nextAppointment.studentId);
   els.nextAppointmentTitle.textContent = student?.name || "Alumno";
-  els.nextAppointmentMeta.textContent = `${formatDate(nextAppointment.date)} · ${nextAppointment.time} · ${nextAppointment.mentor} · ${nextAppointment.channel}`;
+  els.nextAppointmentMeta.textContent = `${formatDate(nextAppointment.date)} - ${nextAppointment.time} - ${nextAppointment.mentor} - ${nextAppointment.channel}`;
 }
 
 function getNextAppointment() {
@@ -328,9 +347,8 @@ function applyView() {
   const viewMeta = {
     dashboard: ["Panel", "Lo importante de hoy, limpio y rapido."],
     agenda: ["Agenda", "Reserva llamadas por Zoom o Meet en segundos."],
-    students: ["Alumnos", "Seguimiento, tienda, tareas y comentarios."],
-    tasks: ["Pendientes", "Alumnos con tareas o pagos por cerrar."],
-    money: ["Cobros", "Importes pendientes y alumnos pagados."]
+    students: ["Alumnos", "Seguimiento, tienda y comentarios."],
+    money: ["Cobros", "Control rapido de pagado por Pascu o no pagado."]
   };
   const [title, subtitle] = viewMeta[state.view] || viewMeta.dashboard;
 
@@ -371,7 +389,7 @@ function renderStudents() {
       </span>
       <span class="row-muted">${escapeHtml(student.course)}</span>
       <span class="row-muted">${formatDate(student.endDate)}</span>
-      <span class="status-pill ${statusClass(student.status)}">${statusLabel(student.status)}</span>
+      <span class="status-pill ${paymentClass(student)}">${paymentLabel(student)}</span>
       <span class="mentor-stack">${renderMentorDots(student)}</span>
     `;
     row.addEventListener("click", () => {
@@ -438,7 +456,7 @@ function renderSlot(day, time) {
   const student = state.students.find((item) => item.id === appointment.studentId);
   return `
     <div class="slot-button booked" data-appointment-id="${appointment.id}">
-      <span>${time} · ${escapeHtml(appointment.channel)}</span>
+      <span>${time} - ${escapeHtml(appointment.channel)}</span>
       <strong>${escapeHtml(student?.name || "Alumno")}</strong>
       <small>${escapeHtml(appointment.mentor)}</small>
       <div class="slot-actions">
@@ -485,7 +503,7 @@ function renderDetail() {
       <div class="info-box"><span>Inicio</span><strong>${formatDate(student.startDate)}</strong></div>
       <div class="info-box"><span>Fin</span><strong>${formatDate(student.endDate)}</strong></div>
       <div class="info-box"><span>Precio</span><strong>${currency.format(student.price || 0)}</strong></div>
-      <div class="info-box"><span>Pendiente</span><strong>${currency.format(pendingAmount(student))}</strong></div>
+      <div class="info-box"><span>Cobro</span><strong class="${paymentClass(student)}">${paymentLabel(student)}</strong></div>
       <div class="info-box"><span>Mentores</span><strong>${studentMentors(student).join(", ") || "Sin asignar"}</strong></div>
       <div class="info-box"><span>Tienda</span><strong>${escapeHtml(student.store || "Sin tienda")}</strong></div>
     </div>
@@ -499,17 +517,6 @@ function renderDetail() {
     </section>
 
     <section class="section-block">
-      <h3>Pendientes</h3>
-      <form class="inline-form" data-form="task">
-        <input name="task" placeholder="Nuevo pendiente" required />
-        <button class="primary-button" type="submit">Anadir</button>
-      </form>
-      <ul class="task-list">
-        ${renderTasks(student)}
-      </ul>
-    </section>
-
-    <section class="section-block">
       <h3>Comentarios de tienda</h3>
       <form class="quick-form" data-form="note">
         <textarea rows="3" name="note" placeholder="Revision, avance, bloqueo o contexto para la proxima llamada" required></textarea>
@@ -520,24 +527,6 @@ function renderDetail() {
       </ul>
     </section>
   `;
-}
-
-function renderTasks(student) {
-  if (!student.tasks.length) {
-    return `<li class="note-item"><span>No hay pendientes abiertos.</span></li>`;
-  }
-
-  return student.tasks
-    .map(
-      (task) => `
-      <li class="task-item ${task.done ? "done" : ""}" data-task-id="${task.id}">
-        <input type="checkbox" ${task.done ? "checked" : ""} aria-label="Completar pendiente" />
-        <span>${escapeHtml(task.text)}<small>${task.dueDate ? `Fecha: ${formatDate(task.dueDate)}` : "Sin fecha"}</small></span>
-        <button class="mini-button" data-action="delete-task" type="button">Quitar</button>
-      </li>
-    `
-    )
-    .join("");
 }
 
 function renderNotes(student) {
@@ -569,7 +558,7 @@ function openStudentDialog(student = null) {
     els.form.startDate.value = student.startDate;
     els.form.endDate.value = student.endDate;
     els.form.price.value = student.price;
-    els.form.paid.value = student.paid;
+    els.form.pascuPaid.value = String(isPascuPaid(student));
     els.form.store.value = student.store;
     els.form.status.value = student.status;
     els.form.mentorCarlos.checked = !!student.mentors?.carlos;
@@ -603,7 +592,8 @@ function handleStudentForm(event) {
     startDate: data.get("startDate"),
     endDate: data.get("endDate"),
     price: Number(data.get("price") || 0),
-    paid: Number(data.get("paid") || 0),
+    pascuPaid: data.get("pascuPaid") === "true",
+    paid: data.get("pascuPaid") === "true" ? Number(data.get("price") || 0) : 0,
     status: data.get("status"),
     mentors: {
       carlos: data.get("mentorCarlos") === "on",
@@ -705,7 +695,7 @@ document.querySelectorAll(".nav-item").forEach((item) => {
     item.classList.add("active");
     state.view = item.dataset.view;
 
-    const filterForView = { dashboard: "all", agenda: "all", students: "all", tasks: "pending", money: "pending" }[state.view];
+    const filterForView = { dashboard: "all", agenda: "all", students: "all", money: "unpaid" }[state.view];
     const chip = document.querySelector(`.chip[data-filter="${filterForView}"]`);
     chip?.click();
 
@@ -760,23 +750,6 @@ els.studentDetail.addEventListener("click", (event) => {
     });
   }
 
-  if (action === "delete-task") {
-    const taskId = event.target.closest("[data-task-id]")?.dataset.taskId;
-    updateSelected((item) => {
-      item.tasks = item.tasks.filter((task) => task.id !== taskId);
-      return item;
-    });
-  }
-});
-
-els.studentDetail.addEventListener("change", (event) => {
-  if (event.target.matches('.task-item input[type="checkbox"]')) {
-    const taskId = event.target.closest("[data-task-id]")?.dataset.taskId;
-    updateSelected((item) => {
-      item.tasks = item.tasks.map((task) => (task.id === taskId ? { ...task, done: event.target.checked } : task));
-      return item;
-    });
-  }
 });
 
 els.studentDetail.addEventListener("submit", (event) => {
@@ -786,14 +759,6 @@ els.studentDetail.addEventListener("submit", (event) => {
   if (form.dataset.form === "nextAction") {
     const nextAction = new FormData(form).get("nextAction").trim();
     updateSelected((item) => ({ ...item, nextAction }));
-  }
-
-  if (form.dataset.form === "task") {
-    const text = new FormData(form).get("task").trim();
-    updateSelected((item) => {
-      item.tasks.unshift({ id: crypto.randomUUID(), text, done: false, dueDate: new Date().toISOString().slice(0, 10) });
-      return item;
-    });
   }
 
   if (form.dataset.form === "note") {

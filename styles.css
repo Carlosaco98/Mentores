@@ -640,6 +640,16 @@ textarea {
   background: #eef0f3;
 }
 
+.status-paid {
+  color: var(--green);
+  background: #e8f5ef;
+}
+
+.status-unpaid {
+  color: var(--red);
+  background: #ffecec;
+}
+
 .mentor-stack {
   display: flex;
   gap: 4px;
@@ -899,7 +909,7 @@ textarea {
 
   .nav-list {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     width: 100%;
     overflow: visible;
   }

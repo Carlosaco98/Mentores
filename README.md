@@ -6,12 +6,12 @@ El diseño sigue el branding de Coinnecta: negro/blanco con amarillo de acento, 
 
 ## Que incluye
 
-- Panel con alumnos activos, pagos pendientes por mentor y revisiones proximas.
-- Vistas simples por seccion: panel, agenda, alumnos, pendientes y cobros.
-- Lista filtrable por alumno, tienda, curso, pendientes, pagos y fechas.
+- Panel con alumnos activos, cobros por confirmar y revisiones proximas.
+- Vistas simples por seccion: panel, agenda, alumnos y cobros.
+- Lista filtrable por alumno, tienda, curso, pagos y fechas.
 - Ficha de alumno con fechas, precio, mentores, tienda y estado.
 - Agenda semanal para reservar llamadas por Zoom o Meet con alumnos.
-- Comentarios de tienda y tareas pendientes.
+- Comentarios de tienda y control de pago por Pascu.
 - Alta y edicion rapida de alumnos.
 - Persistencia local en el navegador y exportacion JSON.
 - Endpoint preparado para Vercel + Supabase.

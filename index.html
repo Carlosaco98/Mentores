@@ -22,7 +22,6 @@
             <button class="nav-item active" data-view="dashboard">Panel</button>
             <button class="nav-item" data-view="agenda">Agenda</button>
             <button class="nav-item" data-view="students">Alumnos</button>
-            <button class="nav-item" data-view="tasks">Pendientes</button>
             <button class="nav-item" data-view="money">Cobros</button>
           </nav>
         </div>
@@ -33,7 +32,7 @@
           <div>
             <p class="eyebrow">Academy operations</p>
             <h1 id="pageTitle">Panel</h1>
-            <p class="page-subtitle" id="pageSubtitle">Resumen claro de alumnos, llamadas y pendientes.</p>
+            <p class="page-subtitle" id="pageSubtitle">Resumen claro de alumnos, llamadas y cobros.</p>
           </div>
           <div class="topbar-actions">
             <button class="ghost-button" id="exportButton" type="button">Exportar</button>
@@ -48,14 +47,14 @@
             <small>En seguimiento ahora</small>
           </article>
           <article class="metric-card">
-            <span>Pendiente Carlos</span>
+            <span>Por pagar Carlos</span>
             <strong id="pendingCarlos">0 EUR</strong>
-            <small>Pagos sin cerrar</small>
+            <small>No pagado por Pascu</small>
           </article>
           <article class="metric-card">
-            <span>Pendiente Irene</span>
+            <span>Por pagar Irene</span>
             <strong id="pendingIrene">0 EUR</strong>
-            <small>Pagos sin cerrar</small>
+            <small>No pagado por Pascu</small>
           </article>
         </section>
 
@@ -66,9 +65,9 @@
             <small id="nextAppointmentMeta">Reserva una hora desde Agenda.</small>
           </article>
           <article class="focus-card">
-            <span>Pendientes abiertos</span>
-            <strong id="openTasksCount">0</strong>
-            <small>Tareas por cerrar con alumnos.</small>
+            <span>Cobros por confirmar</span>
+            <strong id="unpaidStudentsCount">0</strong>
+            <small>Alumnos no pagados por Pascu.</small>
           </article>
           <article class="focus-card">
             <span>Huecos disponibles</span>
@@ -119,7 +118,7 @@
           <div class="agenda-grid" id="agendaGrid"></div>
         </section>
 
-        <section class="workspace view-section" data-section="students tasks money">
+        <section class="workspace view-section" data-section="students money">
           <div class="toolbar">
             <label class="search-box">
               <span>Buscar</span>
@@ -128,8 +127,8 @@
             <div class="filters" aria-label="Filtros">
               <button class="chip active" data-filter="all" type="button">Todos</button>
               <button class="chip" data-filter="active" type="button">Activos</button>
-              <button class="chip" data-filter="pending" type="button">Pendientes</button>
               <button class="chip" data-filter="ending" type="button">Finalizan</button>
+              <button class="chip" data-filter="unpaid" type="button">No pagados</button>
               <button class="chip" data-filter="paid" type="button">Pagados</button>
             </div>
           </div>
@@ -190,8 +189,11 @@
             <input name="price" type="number" min="0" step="10" value="100" />
           </label>
           <label>
-            Pagado
-            <input name="paid" type="number" min="0" step="10" value="0" />
+            Pago Pascu
+            <select name="pascuPaid">
+              <option value="false">No pagado</option>
+              <option value="true">Pagado por Pascu</option>
+            </select>
           </label>
           <label>
             Tienda
